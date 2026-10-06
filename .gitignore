@@ -1,0 +1,31 @@
+# Python / editors
+__pycache__/
+*.pyc
+*.swp
+
+# Derived from the disc image (tools/images.py extract / unpack)
+extracted/
+unpacked/
+
+# Tools built
+tools/unpack
+
+# Analysis outputs (tools/images.py analyse)
+analysis/ss/
+analysis/*.json
+analysis/*.json.pickle
+analysis/out/
+
+# Recompilation: generated C, objects, binaries, run outputs
+recomp/gen/
+recomp/*.o
+recomp/fervour
+recomp/fervour-cov
+recomp/*.events
+recomp/*.vdu
+recomp/*.screen
+recomp/*.regs
+recomp/*.log
+recomp/screenshot-*.bmp
+recomp/*.wav
+recomp/savedata/

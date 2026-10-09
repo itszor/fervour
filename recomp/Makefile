@@ -1,5 +1,5 @@
 # Static recompilation of Fervour: the program (gen/runimage), its
-# modules (gen/fervourmode, aehmodule, soundmaster, joystick), from gen_c.py via
+# modules (gen/fervourmode, aehmodule, soundmaster, joystick), from superspider gen via
 # ../tools/images.py, and game.c, linked with libroger (the RISC OS runtime).
 ROGER   ?= $(HOME)/stuff/libroger
 CC      ?= gcc

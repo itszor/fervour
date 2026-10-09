@@ -7,10 +7,10 @@ The disc holds an ArcFS archive, `Fervour`, with !Fervour (the game),
 filing system.
 
     tools/images.py extract    the ADF and the ArcFS archive -> extracted/
-                               (tools/extract.py, tools/arcfs.py)
+                               ($SS/tools/adf_extract.py, arcfs.py; $SS = ~/stuff/superspider)
     tools/images.py unpack     the packed programs -> unpacked/ (tools/unpack)
     tools/images.py analyse    SuperSpider (~/stuff/superspider) on each image
-    tools/images.py gen        recomp/gen_c.py -> recomp/gen/
+    tools/images.py gen        superspider gen -> recomp/gen/
     recomp/                    make regen (unpack, analyse, gen), make, ./fervour
     tools/events.py            the event log with its strings decoded
     tools/screen.py            screen banks of a headless run as PNGs

@@ -4,13 +4,13 @@
     images.py extract   the disc image -> extracted/ (ADFS, then the ArcFS
                         archive "Fervour" on it, which holds the game)
     images.py unpack    the packed programs -> unpacked/ (see below)
-    images.py analyse   SuperSpider (s1b) on every image, then its phase 6
-                        adapter: analysis/<name>.json(.pickle), analysis/out/<name>/;
-                        analysis/<name>.roots, if there, adds entry points
+    images.py analyse   SuperSpider (superspider analyse --full) on every image:
+                        analysis/<name>.json; analysis/<name>.roots, if there,
+                        adds entry points
     images.py roots LOG...
                         merges the gap entries of --trace-gaps runs (libroger's
                         untranslated.log) into analysis/<name>.roots
-    images.py gen       recomp/gen_c.py for every image -> recomp/gen/<name>/,
+    images.py gen       superspider gen for every image -> recomp/gen/<name>/,
                         plus recomp/gen/modules.inc (game.c's module list)
 
 What !Fervour.!Run2 runs, and what is translated:
@@ -82,8 +82,8 @@ def run(cmd, **kw):
 
 
 def extract():
-    run([sys.executable, '-I', os.path.join(HERE, 'extract.py'), ADF, EXT])
-    run([sys.executable, '-I', os.path.join(HERE, 'arcfs.py'),
+    run([sys.executable, '-I', os.path.join(SS, 'tools', 'adf_extract.py'), ADF, EXT])
+    run([sys.executable, '-I', os.path.join(SS, 'tools', 'arcfs.py'),
          os.path.join(EXT, 'Fervour,fffddc00-00000000'), EXT])
 
 
@@ -130,11 +130,9 @@ def analyse():
     subprocess.run(['dune', 'build'], cwd=SS, check=True)
     exe = os.path.join(SS, '_build/default/bin/main.exe')
     an = os.path.join(TOP, 'analysis')
-    os.makedirs(os.path.join(an, 'ss'), exist_ok=True)
     for name, path, base, exe_addr, module in images():
         img = os.path.join(TOP, path)
-        ssj = os.path.join(an, 'ss', name + '.json')
-        cmd = [exe, 's1b', img, '%x' % base, '-o', ssj]
+        cmd = [exe, 'analyse', img, '%x' % base, '--full', '-o', os.path.join(an, name + '.json')]
         rf = os.path.join(an, name + '.roots')
         if os.path.exists(rf):
             cmd += ['--roots', rf]
@@ -143,9 +141,6 @@ def analyse():
         # records in the workspace
         cmd += ['--module'] if module else ['--exec', '%x' % exe_addr, '--global-r12']
         run(cmd)
-        run([sys.executable, os.path.join(SS, 'phase6/ss_to_spider.py'), ssj, img, '%x' % base,
-             os.path.join(an, name + '.json'), os.path.join(an, 'out', name), an]
-            + (['--module'] if module else []))
 
 
 def roots(logs):
@@ -158,16 +153,15 @@ def roots(logs):
 
 
 def gen():
+    exe = os.path.join(SS, '_build/default/bin/main.exe')
     rc = os.path.join(TOP, 'recomp')
     an = os.path.join(TOP, 'analysis')
     mods = []
     for k, (name, path, base, exe_addr, module) in enumerate(images()):
         tab = 'recomp' if not module else 'recomp_' + name
         prefix = 'F' if not module else 'M%d' % k
-        run([sys.executable, os.path.join(rc, 'gen_c.py'), '--img=' + os.path.join(TOP, path),
-             '--json=' + os.path.join(an, name + '.json'), '--tsvdir=' + os.path.join(an, 'out', name),
-             '--prefix=' + prefix, '--tabprefix=' + tab, '--base=%x' % base,
-             '--out=' + os.path.join(rc, 'gen', name), '--files=%d' % (8 if not module else 1)]
+        run([exe, 'gen', os.path.join(TOP, path), '%x' % base, os.path.join(an, name + '.json'),
+             '--c', os.path.join(rc, 'gen', name), '--prefix=' + prefix, '--tabprefix=' + tab, '--files=%d' % (8 if not module else 1)]
             + (['--covtag=%s' % chr(ord('A') + k)] if module else []))
         if module:
             mods.append((path, tab))

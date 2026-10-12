@@ -6,8 +6,19 @@ The disc holds an ArcFS archive, `Fervour`, with !Fervour (the game),
 !ARV, !MaxMem, !MonType, the joystick utilities and ArcFS's read-only
 filing system.
 
-    tools/images.py extract    the ADF and the ArcFS archive -> extracted/
-                               ($SS/tools/adf_extract.py, arcfs.py; $SS = ~/stuff/superspider)
+A recipe: this repository holds no game data. It rebuilds the game from
+your own copy, recognised by content (recipe.json):
+
+    ./build.sh "Fervour (19xx)(-).zip"      (the TOSEC zip, or the .adf in it)
+    cd recomp && ./fervour
+
+build.sh runs recipe.json's steps with SuperSpider's tools/weave.py
+(~/stuff/superspider, or $SUPERSPIDER; $SS below): it extracts the disc to
+extracted/disc, then the steps below. Needs python3, OCaml/dune, gcc and
+SDL3.
+
+    tools/images.py extract    the ArcFS archive on the disc -> extracted/
+                               ($SS/tools/arcfs.py)
     tools/images.py unpack     the packed programs -> unpacked/ (tools/unpack)
     tools/images.py analyse    SuperSpider (~/stuff/superspider) on each image
     tools/images.py gen        superspider gen -> recomp/gen/

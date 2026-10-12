@@ -29,3 +29,9 @@ recomp/*.log
 recomp/screenshot-*.bmp
 recomp/*.wav
 recomp/savedata/
+
+# The original disc: build.sh (recipe.json) remakes everything from the
+# user's own copy.
+*.adf
+*.zip
+game/

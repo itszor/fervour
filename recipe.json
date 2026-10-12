@@ -1,0 +1,46 @@
+{
+ "name": "fervour",
+ "title": "Fervour (A.E. Hersee / Clares, 1992)",
+ "platform": "acorn-archimedes",
+ "doc": "A recipe: how to turn a user's own copy of the game into a native executable. It holds no game data: the inputs are recognised by content (see $SS/tools/weave.py).",
+ "inputs": {
+  "containers": {
+   "Fervour (19xx)(-).zip": "df5773a78d134dd70d8e51429b4371ccb745632e4675cf5485ef1e8794b8f4b5"
+  },
+  "formats": [
+   "adf",
+   "zip"
+  ]
+ },
+ "discs": [
+  {
+   "name": "disc",
+   "title": "Fervour: the disc, holding the ArcFS archive Fervour (!Fervour)",
+   "known_images": [
+    "f5f1b219d58c7d6873999795fd5ab2710191cca067238490cfe59c8ee0b77e2b"
+   ],
+   "key_files": {
+    "Fervour": "f6746224e41aefc65a753115f5531850317e1b07c9dd3a7dacc001d366144237"
+   },
+   "game_dirs": []
+  }
+ ],
+ "build": [
+  "python3 -I \"$WEAVE\" extract . INPUTS",
+  "python3 -I tools/images.py extract",
+  "make -C recomp regen",
+  "make -C recomp"
+ ],
+ "output": "recomp/fervour",
+ "requires": {
+  "superspider": "~/stuff/superspider, or $SUPERSPIDER (dune build): analyse, gen, tools/weave.py",
+  "libroger": "~/stuff/libroger, or make ROGER=...",
+  "host": [
+   "python3",
+   "ocaml + dune",
+   "gcc",
+   "SDL3 (pkg-config sdl3)"
+  ]
+ },
+ "run": "cd recomp && ./fervour"
+}

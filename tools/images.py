@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """The translated images of Fervour and the steps that build them.
 
-    images.py extract   the disc image -> extracted/ (ADFS, then the ArcFS
-                        archive "Fervour" on it, which holds the game)
+    images.py extract   the ArcFS archive "Fervour" on the disc (extracted/disc,
+                        from SuperSpider's weave.py: recipe.json), which holds
+                        the game -> extracted/
     images.py unpack    the packed programs -> unpacked/ (see below)
     images.py analyse   SuperSpider (superspider analyse --full) on every image:
                         analysis/<name>.json; analysis/<name>.roots, if there,
@@ -48,7 +49,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 TOP = os.path.dirname(HERE)
 EXT = os.path.join(TOP, 'extracted')
 UNP = os.path.join(TOP, 'unpacked')
-ADF = os.path.join(TOP, 'Fervour (19xx)(-)[b].adf')
+DISC = os.path.join(TOP, 'extracted', 'disc')     # the disc, as weave.py extracts it
 SS = os.environ.get('SUPERSPIDER', os.path.expanduser('~/stuff/superspider'))
 APP = '!Fervour'
 
@@ -82,9 +83,8 @@ def run(cmd, **kw):
 
 
 def extract():
-    run([sys.executable, '-I', os.path.join(SS, 'tools', 'adf_extract.py'), ADF, EXT])
     run([sys.executable, '-I', os.path.join(SS, 'tools', 'arcfs.py'),
-         os.path.join(EXT, 'Fervour,fffddc00-00000000'), EXT])
+         os.path.join(DISC, 'Fervour,fffddc00-00000000'), EXT])
 
 
 def squeezed_size(path):
@@ -130,6 +130,7 @@ def analyse():
     subprocess.run(['dune', 'build'], cwd=SS, check=True)
     exe = os.path.join(SS, '_build/default/bin/main.exe')
     an = os.path.join(TOP, 'analysis')
+    os.makedirs(an, exist_ok=True)
     for name, path, base, exe_addr, module in images():
         img = os.path.join(TOP, path)
         cmd = [exe, 'analyse', img, '%x' % base, '--full', '-o', os.path.join(an, name + '.json')]

@@ -36,7 +36,8 @@ Running
 
 Keys (the title page): Space or fire to start, P password, L start at
 level 1, I instructions, D or F12 back to the desktop. A level starts with
-its message; Space again to play. Steering: the cursor keys.
+its message; Space again to play. Steering: Z and X, as the Options
+file has them (the cursor keys do nothing).
 
 What runs
 ---------
@@ -73,6 +74,20 @@ AEHModule, SoundMaster, WimpSlot 448K, then !RUNimage <level set>.
 - SoundMaster drives the sound DMA itself: it claims the sound buffer
   interrupt (device 9), programs MEMC's sound registers for RISC OS 3.1's
   own buffers and mixes four channels into them.
+
+With --desktop the desktop is shown, with the Levels directory open in a
+viewer (libroger's Filer) as !Fervour.!Run opens it - and again by Select
+on the Fervour icon (!Runimage runs <Fervour$Dir>.OPENDIR, a utility doing
+*Filer_OpenDir; game.c does that). Dragging a level set from the viewer to
+the program's icon loads it (Message_DataLoad); so does double-clicking
+one, which on RISC OS would run another Fervour - game.c gives it to this
+one instead. Started with fire (the mouse's Select) rather than Space,
+the game steers by the mouse: every frame it reads the pointer (OS_Word
+21,6), steers towards the side of x=732 it's on, and puts it back 11 OS
+units nearer (21,3) - a movement steers for a while after it. The host
+mouse is captured while it does, at a quarter of an OS unit a pixel (an
+Archimedes mouse was far coarser than a modern one): --mouse-sens=N to
+change that. Code reached only then: analysis/runimage.roots.
 
 Not available: the desktop front end's windows - the level editor,
 options, high scores and passwords windows - which the program creates and

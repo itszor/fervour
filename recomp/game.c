@@ -9,6 +9,7 @@
  * modules, WimpSlot 448K, then !RUNimage <level set>. !Runimage is a Wimp
  * task (see ../README.md); the modules are loaded first here, as !Run2
  * leaves them (gen/modules.inc). */
+#define _GNU_SOURCE                                /* strcasestr */
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
@@ -37,6 +38,34 @@ static int arg(const char *a)
     return 1;
 }
 
+/* The Levels directory, which !Fervour.!Run opens (with OPENDIR, a utility
+ * that does *Filer_OpenDir) as does Select on the Fervour icon: on the
+ * desktop (--desktop), a directory viewer of the level sets */
+static int cli_hook(uint32_t n, int x)
+{
+    (void)x;
+    if (n != 0x05) return 0;                        /* OS_CLI */
+    char s[256];
+    int l = 0;
+    while (l < 255 && MEM[R[0] + l] >= 32) { s[l] = MEM[R[0] + l]; l++; }
+    s[l] = 0;
+    const char *p = strcasestr(s, ".OPENDIR ");
+    if (!p) return 0;
+    roger_log("OS_CLI", "s", s, l);
+    roger_filer_open(p + 9);
+    return 1;
+}
+
+/* A level set double-clicked in the viewer: on RISC OS its !Run would start
+ * another Fervour; here it goes to this one, as dragging it to the level
+ * set's icon bar icon does - which loads it */
+static void filer_run(const char *name)
+{
+    const char *leaf = strrchr(name, '.');
+    if (leaf && leaf[1] == '!' && roger_filer_load(name, -2, 0)) return;
+    fprintf(stderr, "fervour: not run: %s\n", name);
+}
+
 /* What !Loader leaves for !Runimage, which quits at once without it: the
  * number variable FLoader$Task, the real-time clock in units of 2^16
  * centiseconds (bytes 2-4 of OS_Word 14's five) when the loader started -
@@ -57,6 +86,7 @@ static void init(void)
     R[0] = name; R[1] = value; R[2] = 4; R[3] = 0; R[4] = 1;   /* OS_SetVarVal, a number */
     roger_swi(0x24);
     memcpy(R, r, sizeof r);
+    roger_filer_open("<FLevels$Dir>");              /* (!Run's OPENDIR) */
 }
 
 /* The desktop: !Runimage puts two icons on the icon bar - the level set
@@ -105,6 +135,14 @@ static struct roger_config config = {
     .dir_prefixes = prefixes,
     .variables = variables,
     .initial_mode = 12,                         /* the desktop's */
+    /* Started with fire, the game steers by the mouse: each frame it reads
+     * the pointer, steers (at one rate) towards the side of x=732 it's on,
+     * then puts it back 11 OS units nearer 732 - so a movement steers for
+     * a while after it (&3A574-&3A5DC). The host mouse is captured while
+     * it does, and scaled down: an Archimedes mouse gave about 85 OS units
+     * a centimetre, a modern one ten times the pixels (--mouse-sens=N) */
+    .relative_mouse = 1,
+    .mouse_sens = 0.25f,
     .wimpslot = 448 * 1024,                     /* !Run2's */
     .init = init,
     .wimp_idle = wimp_idle,
@@ -112,6 +150,8 @@ static struct roger_config config = {
     .keys = keys,
     .nkeys = sizeof keys / sizeof keys[0],
     .arg = arg,
+    .swi = cli_hook,
+    .filer_run = filer_run,
     .usage = "  --levels=NAME     level set (Beginner, General, Fast, Puzzles, BlankLev)\n",
 };
 

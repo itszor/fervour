@@ -128,6 +128,9 @@ static struct roger_config config = {
     .title = "Fervour (recompiled)",
     /* a controller: Z X steer (the Options file's keys), A and start Space */
     .pad_map = "left=Z,right=X,a=Space,start=Space",
+    /* the controllers as the joystick, if one is connected: Joystick_Read
+     * (instead of DummyJoy's), when fire rather than Space starts */
+    .joystick = ROGER_JOY_ACORN,
     .image_path = "../unpacked/RunImage",       /* unsqueezed and decrypted: ../tools/images.py */
     .image = &recomp_image,
     .entry = 0x8064,                            /* where the decryption leaves it */

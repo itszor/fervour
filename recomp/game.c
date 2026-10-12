@@ -126,6 +126,8 @@ static const uint32_t interpreted[] = {
 
 static struct roger_config config = {
     .title = "Fervour (recompiled)",
+    /* a controller: Z X steer (the Options file's keys), A and start Space */
+    .pad_map = "left=Z,right=X,a=Space,start=Space",
     .image_path = "../unpacked/RunImage",       /* unsqueezed and decrypted: ../tools/images.py */
     .image = &recomp_image,
     .entry = 0x8064,                            /* where the decryption leaves it */

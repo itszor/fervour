@@ -84,7 +84,7 @@ def run(cmd, **kw):
 
 def extract():
     run([sys.executable, '-I', os.path.join(SS, 'tools', 'arcfs.py'),
-         os.path.join(DISC, 'Fervour,fffddc00-00000000'), EXT])
+         os.path.join(DISC, 'Fervour,fffddc00-00007ef3'), EXT])
 
 
 def squeezed_size(path):
